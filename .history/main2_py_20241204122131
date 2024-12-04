@@ -1,0 +1,7 @@
+import os
+import pdfplumber
+import re
+from openpyxl import Workbook
+
+# Ruta de la carpeta con los archivos PDF
+carpeta_pdf = "C:/Users/nestor.gonzalez/Documents/GitHub/igss_resultados"
