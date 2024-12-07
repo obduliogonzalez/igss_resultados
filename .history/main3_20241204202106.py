@@ -1,0 +1,55 @@
+import fitz  # PyMuPDF
+import openpyxl
+
+# Cargar el archivo PDF
+pdf_document = 'C:/Users/nestor.gonzalez/Documents/GitHub/igss_resultados/GARCIA_GAYTAN_OLGA_JUDITH_M.pdf'
+pdf = fitz.open(pdf_document)
+
+# Crear un nuevo archivo Excel
+workbook = openpyxl.Workbook()
+sheet = workbook.active
+
+# Encabezados para la tabla (modifica según tu necesidad)
+headers = [
+    "ID", "Sexo", "RBC-ERITROCITOS", "HGB-HEMOGLOBINA", "HCT-HEMATOCRITO", "MCV", "MCH", "MCHC", 
+    "WBC-LEUCOCITOS", "LYM%-LINFOCITOS", "NEU%-NEUTROFILOS", "MON%-MONOCITOS", 
+    "EOS%-EOSINOFILOS", "BAS%-BASOFILOS", "LYN#-LINFOCITOS", "NEU#-NEUTROFILOS", 
+    "MON#-MONOCITOS", "EOS#-EOSINOFILOS", "BAS#-BASOFILOS", "RDW-CV", "RDW-SD", 
+    "PLT-PLAQUETAS", "MPV", "PDW"
+]
+
+# Escribir encabezados en Excel
+for col_num, header in enumerate(headers, 1):
+    sheet.cell(row=1, column=col_num, value=header)
+
+# Función para procesar texto extraído
+def process_text(text):
+    """
+    Procesa el texto para extraer los valores en el formato correcto.
+    """
+    lines = text.split('\n')
+    data = []
+    for line in lines:
+        # Divide la línea en columnas basadas en tabulaciones o espacios
+        columns = line.split()
+        if len(columns) == len(headers):  # Verifica que tenga el número correcto de columnas
+            data.append(columns)
+    return data
+
+# Iterar sobre cada página del PDF
+row_num = 2  # Comienza en la segunda fila porque la primera tiene los encabezados
+for page_num in range(len(pdf)):
+    page = pdf.load_page(page_num)
+    text = page.get_text("text")  # Extrae el texto de la página
+    
+    # Procesar el texto para obtener los datos
+    rows = process_text(text)
+    for row in rows:
+        for col_num, value in enumerate(row, 1):
+            sheet.cell(row=row_num, column=col_num, value=value)
+        row_num += 1
+
+# Guardar el archivo Excel
+output_file = 'resultado_organizado.xlsx'
+workbook.save(output_file)
+print(f"Archivo Excel generado: {output_file}")
